@@ -1,0 +1,309 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/simple.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h3>Introduction to Akka</h3>
+					<p><small>@pchmiele</small></p>
+				</section>
+				<section>
+					<section>
+						<h3>What is Akka?</h3>
+						<ul>
+							<li>Open Source</li>
+							<li>Written in Scala</li>
+							<li>Java/Scala Api available</li>
+							<li>Akka.NET - .NET port of akka offering F#/C# API</li>
+							<li>Inspired by Erlangs actor model</li>
+							<li>Modular structure</li>
+							<li>Toolset (not framework)</li>
+						</ul>
+					</section>
+					
+					<section>
+						<h3>What akka offers?</h3>
+						<ul>
+							<li class="fragment" data-fragment-index="1">50 milion msg/sec on a single machine</li>
+							<li class="fragment" data-fragment-index="2">~2.5 milion actors per GB of heap</li>
+							<li class="fragment" data-fragment-index="3">Adaptive cluster management, load balancing, routing, paritioning and sharding</li>
+							<li class="fragment" data-fragment-index="4">Self-heal system</li>
+							<li class="fragment" data-fragment-index="5">Asynchronus and distributed design</li>
+							<li class="fragment" data-fragment-index="6">Let it crash model</li>
+						</ul>
+					</section>
+					
+					<section>
+						<h3>Who is using Akka?</h3>
+						<img data-src="resources/companies.png" alt="Down arrow">
+					</section>
+					
+					<section>
+						<h3>Akka ekosystem</h3>
+						<table>
+							<tbody>
+								<tr>
+									<td><img width="120" data-src="resources/akka.png" alt="akka" /></td>
+									<td><img width="120" data-src="resources/play.png" alt="play" /></td>
+									<td><img width="120" data-src="resources/scalatra.png" alt="scalatra" /></td>
+									<td><img width="120" data-src="resources/spray.png" alt="spray" /></td>
+								</tr>
+								<tr>
+									<td><img width="120" data-src="resources/flink.png" alt="flink"/></td>
+									<td><img width="120" data-src="resources/spark.png" alt="spark"/></td>
+									<td><img width="120" data-src="resources/vaadin.png" alt="vaadin"/></td>
+									<td><img width="120" data-src="resources/gatling.png" alt="gatling"/></td>
+								</tr>
+							</tbody>
+						</table>
+						<aside class="notes">
+							<ul>
+								<li>The Play framework for developing web applications offers integration with Akka</li>
+								<li>Apache Spark is built upon Akka</li>
+								<li>The Socko Web Server library supports the implementation of REST APIs for Akka applications</li>
+								<li>The eventsourced library provides Event-driven architecture support for Akka actors</li>
+								<li>The Gatling stress test tool for load-testing web servers is built upon Akka</li>
+								<li>The Scalatra web framework is built upon Akka and offers integration with it</li>
+								<li>The Vaadin web app development framework can integrate with Akka</li>
+								<li>The Apache Flink platform for distributed stream and batch data processing is built upon Akka</li>
+							</ul>						
+						</aside>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>Actor model</h3>
+						<ul>
+							<li class="fragment" data-fragment-index="1">Encapsulates state and behaviour</li>
+							<li class="fragment" data-fragment-index="2">Lightweight</li>
+							<li class="fragment" data-fragment-index="3">Single-threaded</li>
+							<li class="fragment" data-fragment-index="4">No shared state</li>
+							<li class="fragment" data-fragment-index="5">Messages kept in mailbox</li>
+							<li class="fragment" data-fragment-index="6">Messages processed in order</li>
+							<li class="fragment" data-fragment-index="7">Explicit lifecycle</li>
+						</ul>
+						<img data-src="resources/actor-model.jpg" alt="actor model" />
+						<aside class="notes">
+							<ul>
+								<li>actors are objects which encapsulate state and behavior. they communicate exclusively by exchanging messages which are placed into the recipient mailbox</li>
+								<li>actors have explicit lifecycle - they are not automatically destroyed when no longer referenced - user is responsible to destroy them after they are no longer needed</li>
+							</ul>						
+						</aside>
+					</section>
+					
+					<section>
+						<h3>Actors hierarchy</h3>
+						<img data-src="resources/ErrorKernel.png" alt="error kernel" />
+						<aside class="notes">
+							 Supervision related parent child communication happens by special system messages that have their own mailboxes separate from user messages
+						</aside>
+					</section>
+					
+					<section>
+						<h3>Actor system</h3>
+						<ul>
+							<li>Heavier</li>
+							<li>Only consumer of configuration</li>
+							<li>Manages resources in order to run actors</li>
+						</ul>
+						<aside class="notes">
+							An actor system manages the resources it is configured to use in order to run the actors which it contains
+						</aside>
+					</section>
+						
+					<section>
+						<h3>Mailboxes</h3>
+						<ul>
+							<li>Many implementations</li>
+							<li>FIFO by default</li>
+							<li>No scanning mailbox available</li>
+							<li>When actor stopped then his mailbox is replaced by system mailbox redirecting all new messages to event stream as deadletters</li>
+						</ul>
+						<aside class="notes">
+							<ul>
+								<li>akka differs from other actor model implementaations - current behavious must always handle the next dequeued message (no scanning or matching messages)</li>
+								<li>when actor stopped (due to an error, failure or etc.) then his mailbox is replaced by system mailbox redirecting all new messages to event stream as deadletters</li>
+							</ul>						
+						</aside>
+					</section>
+				</section>
+	
+				<section>
+					<h3>Demo 1 - Simple Actor</h3>
+				</section>
+
+				<section>
+					<h3>Demo 2 - Communication between actors</h3>
+				</section>
+				
+				<section>
+					<h3>Actor references and paths</h3>
+					<img data-src="resources/actor-paths.png" alt="actor paths" />
+				</section>
+
+				<section>
+					<h3>Actor lifecycle</h3>
+					<img height="550" data-src="resources/lifecycle.png" alt="lifecycle" />
+				</section>
+				
+				<section>
+					<h3>Supervision</h3>
+					<ul>
+						<li>All actors are able to supervise their children</li>
+						<li>Each actor can have only one supervisor</li>
+						<li>2 Supervision Strategies</li>
+						<ul>
+							<li class="fragment" data-fragment-index="1">AllForOneStrategy - restart all children</li>
+							<li class="fragment" data-fragment-index="2">OneForOneStrategy - restart only one child</li>
+						</ul>
+					</ul>
+					<aside class="notes">
+						supervision strategy could not be changed later - integral part of actor system					
+					</aside>
+				</section>
+				
+				<section>
+					<h3>Demo 3 - Supervision and ActorRef</h3>
+				</section>
+				
+				<section>
+					<h3>Routers and Groups</h3>
+				
+					<ul>
+						<li>RoundRobinPool/RoundRobinGroup</li>
+						<li>RandomPool/RandomGroup</li>
+						<li>BalancingPool</li>
+						<li>SmallestMailboxPool</li>
+						<li>BroadcastPool/BroadcastGroup</li>
+						<li>... and more</li>
+					</ul>
+
+					<table>
+						<tr>
+							<td><img height="200" data-src="resources/BroadcastRouter.png" alt="broadcast router" /></td>
+							<td><img height="200" data-src="resources/RoundRobinRouter.png" alt="round robin router" /></td>
+						</tr>
+					</table>
+
+				</section>
+				
+				<section>
+					<h3>Demo 4 - Routers</h3>
+				</section>
+				
+				<section>
+					<h3>Demo 5 - Switchable behaviour</h3>
+				</section>
+
+				<section>
+					<h3>Demo 6 - Akka persistence</h3>
+					<aside class="notes">
+						The key concept behind Akka persistence is that only changes to an actor's internal state are persisted but never its current state directly					
+					</aside>
+				</section>
+				
+				<section>
+					<h3>Demo 7 - Akka monitoring</h3>
+				</section>
+				
+				<section>
+					<h3>Use cases</h3>
+				
+					<ul>
+						<p><b>Features</b></p>
+						<li class="fragment" data-fragment-index="1">HA</li>
+						<li class="fragment" data-fragment-index="2">Scale-up</li>
+						<li class="fragment" data-fragment-index="3">Scale-out</li>
+						<li class="fragment" data-fragment-index="4">Fault-tolerance</li>
+						<p class="fragment" data-fragment-index="5"><b>Areas</b></p>					
+						<li class="fragment" data-fragment-index="5">Service Backend, Gaming, Concurrency, Transaction Processing, Business Intelligence, Complex Event Stream Processing, and more..</li>
+					</ul>
+
+					<aside class="notes">
+						In 1998 Ericsson announced the AXD301 switch, containing over a million lines of Erlang and reported to achieve a high availability of nine "9"s (31.5569 milliseconds per year)
+					</aside>
+				</section>
+				
+				<section>
+					<h3>Akka/Akka.net differences</h3>
+					<table>
+						<tr>
+							<td><img height="150" data-src="resources/akka.png" alt="akka" /></td>
+							<td/>
+							<td/>
+						</tr>
+						<tr>
+							<td/>
+							<td><img height="150"data-src="resources/versus.png" alt="akka" /></td>
+							<td/>
+						</tr>
+						<tr>
+							<td/>
+							<td/>
+							<td><img height="150" data-src="resources/akka.net.png" alt="akka.net" /></td>
+						</tr>
+					</table>
+				</section>
+				
+				<section>
+					<h3>What's next?</h3>
+					<ul>
+						<li class="fragment" data-fragment-index="1">Akka Clustering</li>
+						<li class="fragment" data-fragment-index="2">Akka HTTP</li>
+						<li class="fragment" data-fragment-index="3">Akka Streams</li>
+						<li class="fragment" data-fragment-index="4">Akka Remote</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h3>Resources</h3>
+					<ul>
+						<li><a href="http://akka.io/">Akka</a></li>
+						<li><a href="http://getakka.net/">Akka.NET</a></li>
+						<li><a href="http://stackoverflow.com/questions/4493001/good-use-case-for-akka">Akka Use Cases</a></li>
+						<li>@pchmiele <a href="https://github.com/pchmiele/akka-scala-demo">demo</a></li>
+					</ul>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+				transition: 'convex', 
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
