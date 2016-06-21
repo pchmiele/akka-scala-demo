@@ -4,7 +4,7 @@ import akka.actor._
 
 class Child extends Actor with ActorLogging {
   def receive = {
-    case _ => println("Kenny received a message")
+    case _ => log.info("Child received a message")
   }
 }
 
@@ -13,8 +13,8 @@ class Parent extends Actor with ActorLogging {
   context.watch(child)
 
   def receive = {
-    case Terminated(child) => println("Child terminated")
-    case _ => println("Parent received a message")
+    case Terminated(child) => log.info("Child terminated")
+    case _ => log.info("Parent received a message")
   }
 }
 
